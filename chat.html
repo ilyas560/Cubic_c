@@ -1,533 +1,947 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Chat with Friend - Real Time</title>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room - Create or Join</title>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 20px;
-      }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
 
-      .chat-container {
-        width: 100%;
-        max-width: 500px;
-        background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        overflow: hidden;
-      }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
 
-      .chat-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 20px;
-        text-align: center;
-      }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
 
-      .chat-header h1 {
-        font-size: 1.5rem;
-        margin-bottom: 5px;
-      }
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
 
-      .chat-header p {
-        font-size: 0.85rem;
-        opacity: 0.9;
-      }
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
 
-      .status-indicator {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        background: #4ade80;
-        border-radius: 50%;
-        margin-right: 8px;
-        animation: pulse 2s infinite;
-      }
+        .screen {
+            display: none;
+        }
 
-      .status-indicator.disconnected {
-        background: #ef4444;
-      }
+        .screen.active {
+            display: block;
+        }
 
-      @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-      }
+        /* Login Screen */
+        .login-form {
+            padding: 40px 30px;
+        }
 
-      .login-screen, .chat-screen {
-        display: none;
-      }
+        .login-form h2 {
+            color: #333;
+            margin-bottom: 25px;
+            text-align: center;
+        }
 
-      .login-screen.active, .chat-screen.active {
-        display: block;
-      }
+        .option-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
 
-      .login-form {
-        padding: 40px 30px;
-        text-align: center;
-      }
+        .option-btn {
+            flex: 1;
+            padding: 20px 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
 
-      .login-form h2 {
-        color: #333;
-        margin-bottom: 20px;
-      }
+        .option-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
 
-      .login-form input {
-        width: 100%;
-        padding: 15px;
-        border: 2px solid #e9ecef;
-        border-radius: 10px;
-        font-size: 1rem;
-        margin-bottom: 15px;
-        outline: none;
-        transition: border-color 0.3s ease;
-      }
+        .option-btn.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
 
-      .login-form input:focus {
-        border-color: #667eea;
-      }
+        .login-form input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
 
-      .login-form button {
-        width: 100%;
-        padding: 15px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: transform 0.2s ease;
-      }
+        .login-form input:focus {
+            border-color: #667eea;
+        }
 
-      .login-form button:hover {
-        transform: translateY(-2px);
-      }
+        .login-form button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
 
-      .channel-info {
-        background: #f8f9fa;
-        padding: 15px 20px;
-        border-bottom: 1px solid #e9ecef;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
+        .login-form button:hover {
+            transform: translateY(-2px);
+        }
 
-      .channel-info span {
-        font-size: 0.9rem;
-        color: #666;
-      }
+        .room-code-display {
+            background: #f0fdf4;
+            border: 2px dashed #16a34a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
-      .channel-info .channel-name {
-        font-weight: 600;
-        color: #667eea;
-      }
+        .room-code-display h3 {
+            color: #166534;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
 
-      .leave-btn {
-        padding: 8px 15px;
-        background: #ef4444;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 0.85rem;
-        transition: background 0.2s ease;
-      }
+        .room-code {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #16a34a;
+            letter-spacing: 5px;
+            font-family: 'Courier New', monospace;
+        }
 
-      .leave-btn:hover {
-        background: #dc2626;
-      }
+        .copy-btn {
+            margin-top: 10px;
+            padding: 8px 20px;
+            background: #16a34a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s ease;
+        }
 
-      .chat-messages {
-        height: 400px;
-        overflow-y: auto;
-        padding: 20px;
-        background: #f8f9fa;
-      }
+        .copy-btn:hover {
+            background: #15803d;
+        }
 
-      .message {
-        margin-bottom: 15px;
-        display: flex;
-        flex-direction: column;
-        animation: slideIn 0.3s ease;
-      }
+        /* Chat Screen */
+        .info-bar {
+            background: #f8f9fa;
+            padding: 12px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
 
-      @keyframes slideIn {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-      .message.sent {
-        align-items: flex-end;
-      }
+        .room-info span {
+            font-size: 0.85rem;
+            color: #666;
+        }
 
-      .message.received {
-        align-items: flex-start;
-      }
+        .room-info .room-name {
+            font-weight: 600;
+            color: #667eea;
+        }
 
-      .message-header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 5px;
-      }
+        .host-badge {
+            background: #fef3c7;
+            color: #d97706;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
 
-      .message-author {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #667eea;
-      }
+        .leave-btn {
+            padding: 8px 15px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s ease;
+        }
 
-      .message.sent .message-author {
-        color: #764ba2;
-      }
+        .leave-btn:hover {
+            background: #dc2626;
+        }
 
-      .message-content {
-        max-width: 75%;
-        padding: 12px 16px;
-        border-radius: 18px;
-        font-size: 0.95rem;
-        line-height: 1.4;
-        word-wrap: break-word;
-      }
+        /* Users List */
+        .users-section {
+            background: #fffbeb;
+            border-bottom: 1px solid #e9ecef;
+            padding: 10px 20px;
+        }
 
-      .message.sent .message-content {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-bottom-right-radius: 4px;
-      }
+        .users-section h4 {
+            font-size: 0.8rem;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
 
-      .message.received .message-content {
-        background: #e9ecef;
-        color: #333;
-        border-bottom-left-radius: 4px;
-      }
+        .users-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
 
-      .message-time {
-        font-size: 0.7rem;
-        color: #999;
-        margin-top: 5px;
-        padding: 0 5px;
-      }
+        .user-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #fef3c7;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #92400e;
+        }
 
-      .message.sent .message-time {
-        text-align: right;
-      }
+        .user-tag .kick-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: none;
+            transition: background 0.2s ease;
+        }
 
-      .system-message {
-        text-align: center;
-        padding: 10px;
-        color: #999;
-        font-size: 0.85rem;
-        font-style: italic;
-      }
+        .host-controls .user-tag .kick-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-      .chat-input-area {
-        padding: 15px 20px;
-        background: #ffffff;
-        border-top: 1px solid #e9ecef;
-        display: flex;
-        gap: 10px;
-      }
+        .user-tag .kick-btn:hover {
+            background: #dc2626;
+        }
 
-      .chat-input-area input {
-        flex: 1;
-        padding: 12px 18px;
-        border: 2px solid #e9ecef;
-        border-radius: 25px;
-        font-size: 0.95rem;
-        outline: none;
-        transition: border-color 0.3s ease;
-      }
+        .user-tag.is-host {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
 
-      .chat-input-area input:focus {
-        border-color: #667eea;
-      }
+        .chat-messages {
+            height: 350px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
 
-      .chat-input-area button {
-        padding: 12px 25px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 25px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.3s ease;
+            position: relative;
+        }
 
-      .chat-input-area button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-      }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-      .online-users {
-        background: #f0fdf4;
-        padding: 10px 20px;
-        border-bottom: 1px solid #e9ecef;
-        font-size: 0.85rem;
-        color: #166534;
-      }
+        .message.sent {
+            align-items: flex-end;
+        }
 
-      .online-users strong {
-        color: #16a34a;
-      }
+        .message.received {
+            align-items: flex-start;
+        }
 
-      ::-webkit-scrollbar {
-        width: 6px;
-      }
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
 
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
+        .message-author {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #667eea;
+        }
 
-      ::-webkit-scrollbar-thumb {
-        background: #c1c1c1;
-        border-radius: 3px;
-      }
+        .message.sent .message-author {
+            color: #764ba2;
+        }
 
-      ::-webkit-scrollbar-thumb:hover {
-        background: #a1a1a1;
-      }
+        .message-content {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .message.sent .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received .message-content {
+            background: #e9ecef;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.deleted .message-content {
+            background: #f3f4f6 !important;
+            color: #9ca3af;
+            font-style: italic;
+            text-decoration: line-through;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: none;
+            transition: background 0.2s ease;
+        }
+
+        .host-controls .message .delete-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: #999;
+            margin-top: 5px;
+            padding: 0 5px;
+        }
+
+        .message.sent .message-time {
+            text-align: right;
+        }
+
+        .system-message {
+            text-align: center;
+            padding: 10px;
+            color: #666;
+            font-size: 0.85rem;
+            background: #e0f2fe;
+            border-radius: 10px;
+            margin: 5px 0;
+        }
+
+        .kick-notification {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .chat-input-area {
+            padding: 15px 20px;
+            background: #ffffff;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .chat-input-area input:focus {
+            border-color: #667eea;
+        }
+
+        .chat-input-area button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .chat-input-area button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #4ade80;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.disconnected {
+            background: #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Host Panel Toggle */
+        .host-panel {
+            background: #fef3c7;
+            padding: 10px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: none;
+        }
+
+        .host-panel.active {
+            display: block;
+        }
+
+        .host-panel h4 {
+            color: #92400e;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .host-panel p {
+            color: #a16207;
+            font-size: 0.8rem;
+        }
+
+        /* Back Button */
+        .back-btn {
+            padding: 8px 15px;
+            background: #6b7280;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            transition: background 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: #4b5563;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
     </style>
-  </head>
-  <body>
-    <div class="chat-container">
-      <!-- Login Screen -->
-      <div class="login-screen active" id="loginScreen">
-        <div class="chat-header">
-          <h1>💬 Real-Time Chat</h1>
-          <p>Chat with your friends instantly!</p>
-        </div>
-        <div class="login-form">
-          <h2>Join Chat Room</h2>
-          <input type="text" id="usernameInput" placeholder="Enter your name" maxlength="20">
-          <input type="text" id="channelInput" placeholder="Enter room name (e.g., friends)" maxlength="30">
-          <button onclick="joinChat()">Join Chat</button>
-        </div>
-      </div>
-
-      <!-- Chat Screen -->
-      <div class="chat-screen" id="chatScreen">
-        <div class="chat-header">
-          <h1><span class="status-indicator" id="statusIndicator"></span>Chat Room</h1>
-          <p id="roomInfo">Room: General</p>
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div class="screen active" id="welcomeScreen">
+            <div class="header">
+                <h1>💬 Chat Room</h1>
+                <p>Create a room or join your friend's room</p>
+            </div>
+            <div class="login-form">
+                <h2>Welcome!</h2>
+                <input type="text" id="usernameInput" placeholder="Enter your name" maxlength="20">
+                <div class="option-buttons">
+                    <button class="option-btn" onclick="showCreateRoom()">🏠 Create Room</button>
+                    <button class="option-btn secondary" onclick="showJoinRoom()">🚪 Join Room</button>
+                </div>
+            </div>
         </div>
 
-        <div class="online-users" id="onlineUsers">
-          <strong id="userCount">0</strong> users online
+        <!-- Create Room Screen -->
+        <div class="screen" id="createRoomScreen">
+            <div class="header">
+                <h1>🏠 Create Room</h1>
+                <p>Share this code with your friend</p>
+            </div>
+            <div class="login-form">
+                <button class="back-btn" onclick="showWelcome()">← Back</button>
+                <div class="room-code-display">
+                    <h3>Your Room Code:</h3>
+                    <div class="room-code" id="roomCodeDisplay">------</div>
+                    <button class="copy-btn" onclick="copyRoomCode()">📋 Copy Code</button>
+                </div>
+                <p style="text-align: center; color: #666; font-size: 0.9rem;">You are the host of this room</p>
+                <button onclick="createRoom()">✅ Enter Room</button>
+            </div>
         </div>
 
-        <div class="channel-info">
-          <span>Room: <span class="channel-name" id="channelName">General</span></span>
-          <button class="leave-btn" onclick="leaveChat()">Leave</button>
+        <!-- Join Room Screen -->
+        <div class="screen" id="joinRoomScreen">
+            <div class="header">
+                <h1>🚪 Join Room</h1>
+                <p>Enter the room code from your friend</p>
+            </div>
+            <div class="login-form">
+                <button class="back-btn" onclick="showWelcome()">← Back</button>
+                <input type="text" id="roomCodeInput" placeholder="Enter room code" maxlength="6" style="text-transform: uppercase; text-align: center; letter-spacing: 3px; font-size: 1.2rem;">
+                <button onclick="joinRoom()">🚀 Join Room</button>
+            </div>
         </div>
 
-        <div class="chat-messages" id="chatMessages">
-          <div class="system-message" id="systemMessage">Join a room to start chatting!</div>
-        </div>
+        <!-- Chat Screen -->
+        <div class="screen" id="chatScreen">
+            <div class="header">
+                <h1><span class="status-indicator" id="statusIndicator"></span>Chat Room</h1>
+                <p id="roomInfo">Room: ------</p>
+            </div>
 
-        <div class="chat-input-area">
-          <input type="text" id="messageInput" placeholder="Type your message..." maxlength="500" autocomplete="off">
-          <button onclick="sendMessage()">Send</button>
+            <div class="host-panel" id="hostPanel">
+                <h4>👑 Host Controls</h4>
+                <p>You can kick users and delete messages</p>
+            </div>
+
+            <div class="info-bar">
+                <div class="room-info">
+                    <span>Room:</span>
+                    <span class="room-name" id="displayRoomCode">------</span>
+                    <span class="host-badge" id="hostBadge" style="display: none;">HOST</span>
+                </div>
+                <button class="leave-btn" onclick="leaveChat()">Leave</button>
+            </div>
+
+            <div class="users-section" id="usersSection">
+                <h4>👥 Users in Room:</h4>
+                <div class="users-list" id="usersList"></div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="system-message" id="systemMessage">Join the room to start chatting!</div>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="messageInput" placeholder="Type your message..." maxlength="500" autocomplete="off">
+                <button onclick="sendMessage()">Send</button>
+            </div>
         </div>
-      </div>
     </div>
 
-    <!-- PubNub for real-time messaging -->
     <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.7.2.0.min.js"></script>
     <script>
-      // Initialize PubNub - Using free demo keys
-      const pubnub = new PubNub({
-        publishKey: 'demo',
-        subscribeKey: 'demo',
-        userId: 'user-' + Math.random().toString(36).substr(2, 9)
-      });
-
-      let currentUser = '';
-      let currentChannel = 'general';
-      let users = new Set();
-
-      // Listen for messages
-      pubnub.addListener({
-        message: function(event) {
-          handleMessage(event.message);
-        },
-        presence: function(event) {
-          handlePresence(event);
-        },
-        status: function(event) {
-          handleStatus(event);
-        }
-      });
-
-      function joinChat() {
-        const username = document.getElementById('usernameInput').value.trim();
-        const channel = document.getElementById('channelInput').value.trim() || 'general';
-
-        if (!username) {
-          alert('Please enter your name!');
-          return;
-        }
-
-        currentUser = username;
-        currentChannel = channel.toLowerCase().replace(/[^a-z0-9-]/g, '');
-
-        // Update UI
-        document.getElementById('loginScreen').classList.remove('active');
-        document.getElementById('chatScreen').classList.add('active');
-        document.getElementById('channelName').textContent = currentChannel;
-        document.getElementById('roomInfo').textContent = 'Room: ' + currentChannel;
-
-        // Clear previous messages
-        document.getElementById('chatMessages').innerHTML = '<div class="system-message">Connected to room: ' + currentChannel + '</div>';
-        users = new Set();
-
-        // Subscribe to channel
-        pubnub.subscribe({
-          channels: [currentChannel],
-          withPresence: true
+        // Initialize PubNub - Using free demo keys
+        const pubnub = new PubNub({
+            publishKey: 'demo',
+            subscribeKey: 'demo',
+            userId: 'user-' + Math.random().toString(36).substr(2, 9)
         });
 
-        // Announce join
-        sendSystemMessage(currentUser + ' joined the chat');
-      }
+        let currentUser = '';
+        let currentRoomCode = '';
+        let isHost = false;
+        let users = new Map(); // uuid -> {name, isHost}
+        let messageCounter = 0;
 
-      function leaveChat() {
-        sendSystemMessage(currentUser + ' left the chat');
+        // Screen navigation functions
+        function showWelcome() {
+            hideAllScreens();
+            document.getElementById('welcomeScreen').classList.add('active');
+        }
 
-        pubnub.unsubscribeAll();
+        function showCreateRoom() {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (!username) {
+                alert('Please enter your name first!');
+                return;
+            }
+            
+            currentUser = username;
+            isHost = true;
+            currentRoomCode = generateRoomCode();
+            
+            document.getElementById('roomCodeDisplay').textContent = currentRoomCode;
+            hideAllScreens();
+            document.getElementById('createRoomScreen').classList.add('active');
+        }
 
-        document.getElementById('chatScreen').classList.remove('active');
-        document.getElementById('loginScreen').classList.add('active');
-        document.getElementById('messageInput').value = '';
-        document.getElementById('usernameInput').value = '';
+        function showJoinRoom() {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (!username) {
+                alert('Please enter your name first!');
+                return;
+            }
+            
+            currentUser = username;
+            isHost = false;
+            
+            hideAllScreens();
+            document.getElementById('joinRoomScreen').classList.add('active');
+        }
 
-        document.getElementById('statusIndicator').classList.add('disconnected');
-      }
+        function hideAllScreens() {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+        }
 
-      function sendMessage() {
-        const input = document.getElementById('messageInput');
-        const message = input.value.trim();
+        function generateRoomCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
 
-        if (!message) return;
+        function copyRoomCode() {
+            navigator.clipboard.writeText(currentRoomCode).then(() => {
+                alert('Room code copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = currentRoomCode;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Room code copied to clipboard!');
+            });
+        }
 
-        const messageData = {
-          type: 'message',
-          text: message,
-          user: currentUser,
-          timestamp: Date.now()
-        };
+        // Room functions
+        function createRoom() {
+            joinChatRoom(currentRoomCode, true);
+        }
 
-        pubnub.publish({
-          channel: currentChannel,
-          message: messageData
+        function joinRoom() {
+            const codeInput = document.getElementById('roomCodeInput').value.trim().toUpperCase();
+            
+            if (!codeInput || codeInput.length !== 6) {
+                alert('Please enter a valid 6-character room code!');
+                return;
+            }
+            
+            currentRoomCode = codeInput;
+            joinChatRoom(currentRoomCode, false);
+        }
+
+        function joinChatRoom(roomCode, host) {
+            isHost = host;
+            
+            // Update UI
+            document.getElementById('displayRoomCode').textContent = roomCode;
+            document.getElementById('roomInfo').textContent = 'Room: ' + roomCode;
+            document.getElementById('chatMessages').innerHTML = '<div class="system-message">Connected to room: ' + roomCode + '</div>';
+            
+            if (isHost) {
+                document.getElementById('hostBadge').style.display = 'inline';
+                document.getElementById('hostPanel').classList.add('active');
+                document.getElementById('chatScreen').classList.add('host-controls');
+            } else {
+                document.getElementById('hostBadge').style.display = 'none';
+                document.getElementById('hostPanel').classList.remove('active');
+            }
+            
+            hideAllScreens();
+            document.getElementById('chatScreen').classList.add('active');
+            
+            // Clear and reset users
+            users = new Map();
+            
+            // Subscribe to channel
+            pubnub.subscribe({
+                channels: [roomCode],
+                withPresence: true
+            });
+            
+            // Announce join
+            sendSystemMessage(currentUser + ' joined the chat');
+        }
+
+        function leaveChat() {
+            sendSystemMessage(currentUser + ' left the chat');
+            
+            pubnub.unsubscribeAll();
+            
+            hideAllScreens();
+            document.getElementById('welcomeScreen').classList.add('active');
+            document.getElementById('messageInput').value = '';
+            document.getElementById('roomCodeInput').value = '';
+            document.getElementById('chatScreen').classList.remove('host-controls');
+            
+            document.getElementById('statusIndicator').classList.add('disconnected');
+        }
+
+        // Messaging functions
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            const messageId = Date.now().toString() + '-' + messageCounter++;
+            
+            const messageData = {
+                type: 'message',
+                id: messageId,
+                text: message,
+                user: currentUser,
+                timestamp: Date.now(),
+                isHost: isHost
+            };
+            
+            pubnub.publish({
+                channel: currentRoomCode,
+                message: messageData
+            });
+            
+            input.value = '';
+            input.focus();
+        }
+
+        function deleteMessage(messageId) {
+            const messageData = {
+                type: 'delete',
+                messageId: messageId,
+                deletedBy: currentUser,
+                timestamp: Date.now()
+            };
+            
+            pubnub.publish({
+                channel: currentRoomCode,
+                message: messageData
+            });
+        }
+
+        function kickUser(userName, userUuid) {
+            const kickData = {
+                type: 'kick',
+                kickedUser: userName,
+                kickedBy: currentUser,
+                targetUuid: userUuid,
+                timestamp: Date.now()
+            };
+            
+            pubnub.publish({
+                channel: currentRoomCode,
+                message: kickData
+            });
+        }
+
+        function handleMessage(data) {
+            const messagesDiv = document.getElementById('chatMessages');
+            
+            if (data.type === 'system') {
+                messagesDiv.innerHTML += '<div class="system-message">' + escapeHtml(data.text) + '</div>';
+            } else if (data.type === 'message') {
+                const isSent = data.user === currentUser;
+                messagesDiv.innerHTML += `
+                    <div class="message ${isSent ? 'sent' : 'received'}" data-message-id="${data.id}">
+                        <div class="message-header">
+                            <span class="message-author">${escapeHtml(data.user)}</span>
+                            ${data.isHost ? '<span class="host-badge" style="font-size: 0.65rem; padding: 2px 6px;">HOST</span>' : ''}
+                        </div>
+                        <div class="message-content">${escapeHtml(data.text)}</div>
+                        <div class="message-time">${formatTime(data.timestamp)}</div>
+                        ${isHost || data.user === currentUser ? `<button class="delete-btn" onclick="deleteMessage('${data.id}')">✕</button>` : ''}
+                    </div>
+                `;
+            } else if (data.type === 'delete') {
+                const messageEl = document.querySelector(`[data-message-id="${data.messageId}"]`);
+                if (messageEl) {
+                    messageEl.classList.add('deleted');
+                    messageEl.querySelector('.message-content').textContent = '[Message deleted by host]';
+                    const deleteBtn = messageEl.querySelector('.delete-btn');
+                    if (deleteBtn) deleteBtn.remove();
+                }
+            } else if (data.type === 'kick') {
+                messagesDiv.innerHTML += `<div class="system-message kick-notification">⚠️ ${escapeHtml(data.kickedUser)} was kicked by ${escapeHtml(data.kickedBy)}</div>`;
+                
+                if (data.kickedUser === currentUser) {
+                    // Kicked user leaves
+                    setTimeout(() => {
+                        alert('You were kicked from the room by the host.');
+                        leaveChat();
+                    }, 1000);
+                }
+            }
+            
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function handlePresence(event) {
+            const action = event.action;
+            const uuid = event.uuid;
+            const count = event.occupancy;
+            const payload = event.userMetadata;
+            
+            updateUsersList();
+        }
+
+        function handleStatus(event) {
+            const status = event.category;
+            
+            if (status === 'PNConnectedCategory') {
+                document.getElementById('statusIndicator').classList.remove('disconnected');
+            } else if (status === 'PNReconnectedCategory') {
+                document.getElementById('statusIndicator').classList.remove('disconnected');
+            } else if (status === 'PNNetworkDownCategory' || status === 'PNNetworkIssuesCategory') {
+                document.getElementById('statusIndicator').classList.add('disconnected');
+            }
+        }
+
+        function updateUsersList() {
+            const usersList = document.getElementById('usersList');
+            const present = pubnub.getSubscribedChannels();
+            
+            // This is a simplified version - in production you'd want to track users properly
+            usersList.innerHTML = `
+                <div class="user-tag ${isHost ? 'is-host' : ''}">
+                    ${escapeHtml(currentUser)} ${isHost ? '👑' : ''}
+                </div>
+            `;
+        }
+
+        function sendSystemMessage(text) {
+            const messageData = {
+                type: 'system',
+                text: text
+            };
+            
+            pubnub.publish({
+                channel: currentRoomCode,
+                message: messageData
+            });
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Event listeners
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
         });
 
-        input.value = '';
-        input.focus();
-      }
-
-      function handleMessage(data) {
-        const messagesDiv = document.getElementById('chatMessages');
-
-        if (data.type === 'system') {
-          messagesDiv.innerHTML += '<div class="system-message">' + data.text + '</div>';
-        } else if (data.type === 'message') {
-          const isSent = data.user === currentUser;
-          messagesDiv.innerHTML += `
-            <div class="message ${isSent ? 'sent' : 'received'}">
-              <div class="message-header">
-                <span class="message-author">${escapeHtml(data.user)}</span>
-              </div>
-              <div class="message-content">${escapeHtml(data.text)}</div>
-              <div class="message-time">${formatTime(data.timestamp)}</div>
-            </div>
-          `;
-        }
-
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-      }
-
-      function handlePresence(event) {
-        const action = event.action;
-        const uuid = event.uuid;
-        const count = event.occupancy;
-
-        document.getElementById('userCount').textContent = count;
-
-        if (uuid && uuid !== pubnub.getUUID()) {
-          if (action === 'join') {
-            users.add(uuid);
-          } else if (action === 'leave' || action === 'timeout') {
-            users.delete(uuid);
-          }
-        }
-      }
-
-      function handleStatus(event) {
-        const status = event.category;
-
-        if (status === 'PNConnectedCategory') {
-          document.getElementById('statusIndicator').classList.remove('disconnected');
-        } else if (status === 'PNReconnectedCategory') {
-          document.getElementById('statusIndicator').classList.remove('disconnected');
-        } else if (status === 'PNNetworkDownCategory' || status === 'PNNetworkIssuesCategory') {
-          document.getElementById('statusIndicator').classList.add('disconnected');
-        }
-      }
-
-      function sendSystemMessage(text) {
-        const messageData = {
-          type: 'system',
-          text: text
-        };
-
-        pubnub.publish({
-          channel: currentChannel,
-          message: messageData
+        document.getElementById('roomCodeInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                joinRoom();
+            }
         });
-      }
 
-      function formatTime(timestamp) {
-        const date = new Date(timestamp);
-        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-      }
+        document.getElementById('roomCodeInput').addEventListener('input', function(e) {
+            e.target.value = e.target.value.toUpperCase();
+        });
 
-      function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-      }
+        // Save username
+        document.getElementById('usernameInput').addEventListener('change', function() {
+            localStorage.setItem('chatUsername', this.value);
+        });
 
-      // Send message with Enter key
-      document.getElementById('messageInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          sendMessage();
+        // Load saved username
+        const savedUsername = localStorage.getItem('chatUsername');
+        if (savedUsername) {
+            document.getElementById('usernameInput').value = savedUsername;
         }
-      });
 
-      // Load saved username if exists
-      const savedUsername = localStorage.getItem('chatUsername');
-      if (savedUsername) {
-        document.getElementById('usernameInput').value = savedUsername;
-      }
-
-      // Save username on join
-      document.getElementById('usernameInput').addEventListener('change', function() {
-        localStorage.setItem('chatUsername', this.value);
-      });
+        // Initialize PubNub listeners
+        pubnub.addListener({
+            message: function(event) {
+                handleMessage(event.message);
+            },
+            presence: function(event) {
+                handlePresence(event);
+            },
+            status: function(event) {
+                handleStatus(event);
+            }
+        });
     </script>
-  </body>
+</body>
 </html>
 
